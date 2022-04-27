@@ -17,7 +17,7 @@ class operation:
         str3 = "&count="
         total = str1, type, str2, teamId, str3, count
 
-        url = str.join(total)
+        url = ''.join(total)
 
         payload = {
         }
@@ -30,7 +30,7 @@ class operation:
         str2 = "&teamId="
         total = str1, type, str2, teamId
 
-        url = str.join(total)
+        url = ''.join(total)
 
         payload = {
         }
@@ -64,7 +64,7 @@ class operation:
         str2 = "&teamId="
         total = str1, type, str2, teamId
 
-        url = str.join(total)
+        url = ''.join(total)
 
         payload = {
         }
