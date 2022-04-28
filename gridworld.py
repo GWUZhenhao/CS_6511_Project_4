@@ -1,8 +1,9 @@
 import numpy as np
 import random
+from environment import Env
 from collections import defaultdict
 
-class q_learning:
+class q_learning():
     def __init__(self, actions):
         # actions = [0, 1, 2, 3] :  ['North', 'South', 'West', 'East']
         self.actions = actions
@@ -37,3 +38,23 @@ class q_learning:
                     max_list.append(index)
             action = random.choice(max_list)
         return action
+
+if __name__ == '__main__':
+    env = Env()
+    agent = q_learning([0, 1, 2, 3])
+    for episode in range(100):
+        state = env.reset()
+
+        while True:
+            env.render()
+
+            action = agent.get_action(str(state))
+            next_state, reward, done = env.step(action)
+
+            agent.learn(str(state), action, reward, str(next_state))
+
+            state = next_state
+            env.print_value_all(agent.q_table)
+
+            if done:
+                break
