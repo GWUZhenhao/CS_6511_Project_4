@@ -106,7 +106,7 @@ def find_the_max_state(q_table):
 if __name__ == '__main__':
 
     teamId = 1304  # Team Zhenhao
-    world = 0
+    world = 8
     agent = gridworld.q_learning([0, 1, 2, 3])
     op = operation.operation(teamId=teamId)
     actions = ['N', 'S', 'W', 'E']
@@ -120,6 +120,10 @@ if __name__ == '__main__':
     print(op.enter_a_world(world))
 
     for episode in range(10):
+
+        # count for approaching
+        count_approaching = 0
+
         # Initialize the game
         op.reset_my_team()
         op.enter_a_world(world)
@@ -136,15 +140,19 @@ if __name__ == '__main__':
             target_state = find_the_max_state(agent.q_table)
             while True:
                 # Make a move based on the RL algorithm
+                count_approaching += 1
                 print('approaching...')
                 index_action = agent.approaching(target_state=target_state, current_state=str(state))
                 # If the q score of current action is too low, doesn't use approach for this state.
                 if agent.q_table[str(state)][index_action] < -10:
                     index_action = agent.get_action(str(state))
+                if count_approaching >= 40:
+                    index_action = agent.get_action(str(state))
                 action = actions[index_action]
                 move_result = op.make_a_move(worldId=world, move=action)
-                reward = move_result['reward']
                 print(move_result)
+                reward = move_result['reward']
+
 
                 # The conditional statement to stop
                 if move_result['newState'] == None:
@@ -156,6 +164,7 @@ if __name__ == '__main__':
                     for i in range(4):
                         agent.q_table[str(state)][i] = reward
                     break
+
 
                 # Update Q table for the RL algorithm based on the rewards
                 new_state = [int(i) for i in move_result['newState'].values()]
@@ -171,8 +180,9 @@ if __name__ == '__main__':
             index_action = agent.get_action(str(state))
             action = actions[index_action]
             move_result = op.make_a_move(worldId=world, move=action)
-            reward = move_result['reward']
             print(move_result)
+            reward = move_result['reward']
+
 
             # The conditional statement to stop
             if move_result['newState'] == None:
