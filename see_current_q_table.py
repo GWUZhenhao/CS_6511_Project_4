@@ -6,7 +6,7 @@ import numpy as np
 # Read the q_table
 with open('q_table_5.json') as json_file:
     q_table = json.load(json_file)
-print('read the q_table finished, begin to painting...')
+print('Reading the q_table finished, begin to painting...')
 
 # Draw the q_table
 env = Env()
