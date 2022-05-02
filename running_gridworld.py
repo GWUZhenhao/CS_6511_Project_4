@@ -1,9 +1,11 @@
+import copy
 import pickle
 import tkinter as tk
 import operation
 import gridworld
 import matplotlib.pyplot as plt
 import time
+import json
 
 UNIT = 50
 HEIGHT = 40
@@ -12,8 +14,6 @@ WIDTH = 40
 class Env(tk.Tk):
     def __init__(self):
         super(Env, self).__init__()
-        self.action_space = ['u', 'd', 'l', 'r']
-        self.n_actions = len(self.action_space)
         self.title('Q Learning')
         self.canvas = self._build_canvas()
         self.texts = []
@@ -39,11 +39,20 @@ class Env(tk.Tk):
         time.sleep(0.5)
         self.update()
 
+# Save the q_table with json
+def save_q_table(agent):
+    dict_q_table = {key:agent.q_table[key] for key in agent.q_table.keys()}
+    with open("q_table.json", "w") as outfile:
+        json.dump(dict_q_table, indent=4, sort_keys=True,fp=outfile)
+
+def load_q_table(agent):
+    with open('q_table.json') as json_file:
+        q_table = json.load(json_file)
+    for key in q_table.keys():
+        agent.q_table[key] = q_table[key]
+    return agent
 
 def print_q_table(q_table, env):
-
-    # Creat an empty canvas with 40*40 grid
-
     # For each grid, draw the four q value
     size = 5
     style = 'normal'
@@ -68,7 +77,13 @@ def print_q_table(q_table, env):
 
                     x, y = origin_y + (UNIT * i), origin_x + (UNIT * j)
                     font = (font, str(size), style)
-                    text = env.canvas.create_text(int(x), int(y), fill="black", text=round(temp, 3), font=font, anchor=anchor)
+                    if temp > 10 or temp < -10:
+                        font = (font, '20', style)
+                        text = env.canvas.create_text(int(x), int(y), fill="red", text=round(temp, 3), font=font,
+                                                      anchor=anchor)
+                    else:
+                        text = env.canvas.create_text(int(x), int(y), fill="black", text=round(temp, 3), font=font,
+                                                      anchor=anchor)
 
                     env.texts.append(text)
     env.canvas.update()
@@ -82,7 +97,7 @@ if __name__ == '__main__':
     agent = gridworld.q_learning([0, 1, 2, 3])
     op = operation.operation(teamId=teamId)
     actions = ['N', 'S', 'W', 'E']
-    env = Env()
+    # env = Env()
 
     # Reset the game at first
     op.reset_my_team()
@@ -91,12 +106,15 @@ if __name__ == '__main__':
     print('Try to enter a new world, worldId = {}.'.format(world))
     print(op.enter_a_world(world))
 
-    for episode in range(1):
+    for episode in range(10):
         # Initialize the game
         op.reset_my_team()
         op.enter_a_world(world)
         state = op.get_location()['state']
         state = [int(i) for i in state.split(':')]
+
+        # load the q_table:
+        agent = load_q_table(agent)
 
         while True:
 
@@ -123,10 +141,10 @@ if __name__ == '__main__':
             # Another way to stop
             # if int(op.get_location()['world']) == -1:
             #     break
-            print_q_table(agent.q_table, env)
+
+            # print_q_table(agent.q_table, env)
         print(agent.q_table)
 
-    # Save the q_table we trained
-    with open("q_table.pkl", "wb") as pkl_handle:
-        pickle.dump(agent.q_table, pkl_handle)
+        # Save the q_table we trained
+        save_q_table(agent)
     print('finished')
