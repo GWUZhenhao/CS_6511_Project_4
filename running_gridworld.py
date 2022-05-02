@@ -146,7 +146,7 @@ if __name__ == '__main__':
                 # If the q score of current action is too low, doesn't use approach for this state.
                 if agent.q_table[str(state)][index_action] < -10:
                     index_action = agent.get_action(str(state))
-                if count_approaching >= 40:
+                if count_approaching >= 80:
                     index_action = agent.get_action(str(state))
                 action = actions[index_action]
                 move_result = op.make_a_move(worldId=world, move=action)
