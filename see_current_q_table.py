@@ -4,7 +4,7 @@ import time
 import numpy as np
 
 # Read the q_table
-with open('q_table_5.json') as json_file:
+with open('q_table.json') as json_file:
     q_table = json.load(json_file)
 print('Reading the q_table finished, begin to painting...')
 

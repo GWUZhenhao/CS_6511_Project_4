@@ -106,7 +106,7 @@ def find_the_max_state(q_table):
 if __name__ == '__main__':
 
     teamId = 1304  # Team Zhenhao
-    world = 1
+    world = 0
     agent = gridworld.q_learning([0, 1, 2, 3])
     op = operation.operation(teamId=teamId)
     actions = ['N', 'S', 'W', 'E']
@@ -114,7 +114,7 @@ if __name__ == '__main__':
 
     # Reset the game at first
     op.reset_my_team()
-    # print(op.get_runs(10))
+    # print(json.dumps(op.get_runs(10), indent = 4))
     # print(op.get_location())
     print('Try to enter a new world, worldId = {}.'.format(world))
     print(op.enter_a_world(world))
@@ -150,8 +150,11 @@ if __name__ == '__main__':
                 if move_result['newState'] == None:
                     # Before stop, we need update the Q value for the current state
                     # current Q value = previous Q value + learning_rate *（reward - previous Q value）
-                    agent.q_table[str(state)][index_action] += agent.learning_rate * (
-                                reward - agent.q_table[str(state)][index_action])
+                    # agent.q_table[str(state)][index_action] += agent.learning_rate * (
+                    #             reward - agent.q_table[str(state)][index_action])
+                    # current Q value in four directions = reward
+                    for i in range(4):
+                        agent.q_table[str(state)][i] = reward
                     break
 
                 # Update Q table for the RL algorithm based on the rewards
@@ -175,7 +178,10 @@ if __name__ == '__main__':
             if move_result['newState'] == None:
                 # Before stop, we need update the Q value for the current state
                 # current Q value = previous Q value + learning_rate *（reward - previous Q value）
-                agent.q_table[str(state)][index_action] += agent.learning_rate * (reward - agent.q_table[str(state)][index_action])
+                # agent.q_table[str(state)][index_action] += agent.learning_rate * (reward - agent.q_table[str(state)][index_action])
+                # current Q value in four directions = reward
+                for i in range(4):
+                    agent.q_table[str(state)][i] = reward
                 break
 
             # Update Q table for the RL algorithm based on the rewards
