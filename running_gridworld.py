@@ -106,7 +106,7 @@ def find_the_max_state(q_table):
 if __name__ == '__main__':
 
     teamId = 1304  # Team Zhenhao
-    world = 5
+    world = 1
     agent = gridworld.q_learning([0, 1, 2, 3])
     op = operation.operation(teamId=teamId)
     actions = ['N', 'S', 'W', 'E']
@@ -129,6 +129,7 @@ if __name__ == '__main__':
         # load the q_table:
         agent = load_q_table(agent, world)
 
+        # If we find a very good point, just approaching it
         if len(agent.q_table) == 0:
             pass
         elif np.sum(agent.q_table[find_the_max_state(agent.q_table)]) > 1000:
@@ -137,6 +138,9 @@ if __name__ == '__main__':
                 # Make a move based on the RL algorithm
                 print('approaching...')
                 index_action = agent.approaching(target_state=target_state, current_state=str(state))
+                # If the q score of current action is too low, doesn't use approach for this state.
+                if agent.q_table[str(state)][index_action] < -10:
+                    index_action = agent.get_action(str(state))
                 action = actions[index_action]
                 move_result = op.make_a_move(worldId=world, move=action)
                 reward = move_result['reward']
