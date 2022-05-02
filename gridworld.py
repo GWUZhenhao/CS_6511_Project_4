@@ -41,6 +41,28 @@ class q_learning():
         return action
         '''
 
+    def approaching(self, target_state, current_state):
+        target_state_x = int(target_state.split(',')[0][1:])
+        target_state_y = int(target_state.split(',')[1][1:-1])
+        current_state_x = int(current_state.split(',')[0][1:])
+        current_state_y = int(current_state.split(',')[1][1:-1])
+
+        x_diff = target_state_x - current_state_x
+
+        if x_diff > 0:
+            return 3
+        if x_diff < 0:
+            return 2
+
+        y_diff = target_state_y - current_state_y
+
+        if y_diff > 0:
+            return 0
+        if y_diff < 0:
+            return 1
+
+        return self.get_action(current_state)
+
     # This is the get_action function without epsilon
     def get_action(self, state):
         # 贪心，取q_table中q值最大的

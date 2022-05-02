@@ -1,9 +1,10 @@
 import copy
+import os.path
 import pickle
 import tkinter as tk
 import operation
 import gridworld
-import matplotlib.pyplot as plt
+import numpy as np
 import time
 import json
 
@@ -40,13 +41,15 @@ class Env(tk.Tk):
         self.update()
 
 # Save the q_table with json
-def save_q_table(agent):
+def save_q_table(agent, num_world):
     dict_q_table = {key:agent.q_table[key] for key in agent.q_table.keys()}
-    with open("q_table.json", "w") as outfile:
+    with open("q_table_{}.json".format(num_world), "w") as outfile:
         json.dump(dict_q_table, indent=4, sort_keys=True,fp=outfile)
 
-def load_q_table(agent):
-    with open('q_table.json') as json_file:
+def load_q_table(agent, num_world):
+    if os.path.exists('q_table_{}.json'.format(num_world)) == False:
+        return agent
+    with open('q_table_{}.json'.format(num_world)) as json_file:
         q_table = json.load(json_file)
     for key in q_table.keys():
         agent.q_table[key] = q_table[key]
@@ -89,11 +92,21 @@ def print_q_table(q_table, env):
     env.canvas.update()
     print()
 
+def find_the_max_state(q_table):
+    max_values = -100000
+    max_key = None
+    for key in q_table.keys():
+        value = np.sum(q_table[key])
+        if value > max_values:
+            max_key = key
+            max_values = value
+    return max_key
+
 
 if __name__ == '__main__':
 
     teamId = 1304  # Team Zhenhao
-    world = 0
+    world = 5
     agent = gridworld.q_learning([0, 1, 2, 3])
     op = operation.operation(teamId=teamId)
     actions = ['N', 'S', 'W', 'E']
@@ -114,7 +127,36 @@ if __name__ == '__main__':
         state = [int(i) for i in state.split(':')]
 
         # load the q_table:
-        agent = load_q_table(agent)
+        agent = load_q_table(agent, world)
+
+        if len(agent.q_table) == 0:
+            pass
+        elif np.sum(agent.q_table[find_the_max_state(agent.q_table)]) > 1000:
+            target_state = find_the_max_state(agent.q_table)
+            while True:
+                # Make a move based on the RL algorithm
+                print('approaching...')
+                index_action = agent.approaching(target_state=target_state, current_state=str(state))
+                action = actions[index_action]
+                move_result = op.make_a_move(worldId=world, move=action)
+                reward = move_result['reward']
+                print(move_result)
+
+                # The conditional statement to stop
+                if move_result['newState'] == None:
+                    # Before stop, we need update the Q value for the current state
+                    # current Q value = previous Q value + learning_rate *（reward - previous Q value）
+                    agent.q_table[str(state)][index_action] += agent.learning_rate * (
+                                reward - agent.q_table[str(state)][index_action])
+                    break
+
+                # Update Q table for the RL algorithm based on the rewards
+                new_state = [int(i) for i in move_result['newState'].values()]
+                agent.learn(str(state), index_action, reward, str(new_state))
+                state = new_state
+            print(agent.q_table)
+            save_q_table(agent, world)
+            continue
 
         while True:
 
@@ -146,5 +188,5 @@ if __name__ == '__main__':
         print(agent.q_table)
 
         # Save the q_table we trained
-        save_q_table(agent)
+        save_q_table(agent, world)
     print('finished')
