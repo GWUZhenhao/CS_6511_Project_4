@@ -106,11 +106,11 @@ def find_the_max_state(q_table):
 if __name__ == '__main__':
 
     teamId = 1304  # Team Zhenhao
-    world = 8
+    world = 10
     agent = gridworld.q_learning([0, 1, 2, 3])
     op = operation.operation(teamId=teamId)
     actions = ['N', 'S', 'W', 'E']
-    # env = Env()
+    env = Env()
 
     # Reset the game at first
     op.reset_my_team()
@@ -119,7 +119,7 @@ if __name__ == '__main__':
     print('Try to enter a new world, worldId = {}.'.format(world))
     print(op.enter_a_world(world))
 
-    for episode in range(10):
+    for episode in range(20):
 
         # count for approaching
         count_approaching = 0
@@ -182,6 +182,8 @@ if __name__ == '__main__':
             move_result = op.make_a_move(worldId=world, move=action)
             print(move_result)
             reward = move_result['reward']
+            if 0 < reward < 0.5:
+                reward = -0.001
 
 
             # The conditional statement to stop

@@ -10,7 +10,7 @@ class q_learning():
         self.learning_rate = 0.2
         self.Lambda = 0.9
         # ε
-        # self.epsilon = 0.1
+        self.epsilon = 0.2
         # 建立一个以State为行、Action('North', 'South', 'West', 'East')为列的Q-Table
         self.q_table = defaultdict(lambda: [0.0, 0.0, 0.0, 0.0])
 
@@ -19,7 +19,6 @@ class q_learning():
         # 现在的Q值 = 原来的Q值 + 学习率 *（立即回报 + Lambda * 后继状态的最大Q值 - 原来的Q值）
         self.q_table[state][action] += self.learning_rate * (reward + self.Lambda * max(self.q_table[next_state]) - self.q_table[state][action])
 
-    '''
     # ε-greedy策略 https://blog.csdn.net/mamiyahasaki/article/details/121927048
     def get_action(self, state):
         # (0,1)间随机，ε = 0.1  0.1概率随机，0.9概率贪心
@@ -39,7 +38,7 @@ class q_learning():
                     max_list.append(index)
             action = random.choice(max_list)
         return action
-        '''
+
 
     def approaching(self, target_state, current_state):
         target_state_x = int(target_state.split(',')[0][1:])
@@ -49,10 +48,11 @@ class q_learning():
 
         x_diff = target_state_x - current_state_x
 
-        if x_diff > 0:
-            return 3
-        if x_diff < 0:
-            return 2
+        if np.random.rand() <= 0.5:
+            if x_diff > 0:
+                return 3
+            if x_diff < 0:
+                return 2
 
         y_diff = target_state_y - current_state_y
 
@@ -63,7 +63,7 @@ class q_learning():
 
         return self.get_action(current_state)
 
-    # This is the get_action function without epsilon
+'''    # This is the get_action function without epsilon
     def get_action(self, state):
         # 贪心，取q_table中q值最大的
         max_list = []
@@ -76,7 +76,7 @@ class q_learning():
             elif value == max_value:
                 max_list.append(index)
         action = random.choice(max_list)
-        return action
+        return action'''
 
 if __name__ == '__main__':
     env = Env()
